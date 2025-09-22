@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+targetlock-backend/node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+targetlock-backend/.env
+.env.backend.example
+
+# Development files
+.vscode/
+.DS_Store
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Backend folders (will be deployed separately)
+backend/
+targetlock-backend/
+
+# Build artifacts (Vercel will handle building)
+build/
+
+# Documentation
+README.md
+Target Lock Project Analysis.pdf
+
+# Git
+.git/
+.gitignore
+
+# Testing
+coverage/
+
+# IDE files
+.vscode/
