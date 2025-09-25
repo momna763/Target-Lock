@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const reportSchema = new mongoose.Schema({
   userId: {
@@ -58,4 +58,5 @@ reportSchema.index({ userId: 1, type: 1 });
 reportSchema.index({ generatedAt: -1 });
 reportSchema.index({ type: 1, generatedAt: -1 });
 
-module.exports = mongoose.model('Report', reportSchema);
+// ✅ Export as ESM default
+export default mongoose.models.Report || mongoose.model("Report", reportSchema);
