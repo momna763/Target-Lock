@@ -31,21 +31,8 @@ const mockProducts = [
   { name: 'Face Cream', category: 'Beauty', profitabilityScore: 88, trendPercentage: 10 }
 ];
 
-// Mock products endpoint
-app.get('/api/products', (req, res) => {
-  res.json(mockProducts);
-});
+// Real database endpoints (these will be used now)
 
-// Mock metrics endpoint  
-app.get('/api/metrics', (req, res) => {
-  res.json({
-    totalProducts: 4,
-    avgProfitability: 85.75,
-    trendingThisWeek: 2,
-    topCategory: 'Electronics',
-    marketsCovered: 4
-  });
-});
 // Sync user with Firebase
 app.post("/api/sync-user", async (req, res) => {
   try {

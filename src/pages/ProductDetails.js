@@ -1,78 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, TrendingUp, TrendingDown, Star, ShoppingCart, Heart, Share2, Eye } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  TrendingUp,
+  ShoppingCart,
+  Heart,
+  Share2,
+  Package,
+} from "lucide-react";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Mock product data - in real app, fetch from API
+  // ✅ Consistent API base URL
+  const API_BASE_URL =
+    process.env.REACT_APP_API_URL || "http://localhost:5001/api";
+
+  // Fetch product data from API
   useEffect(() => {
-    const mockProduct = {
-      id: id || 1,
-      name: 'Smart Fitness Watch Pro',
-      category: 'Wearables',
-      price: 299.99,
-      currency: 'USD',
-      originalPrice: 399.99,
-      rating: 4.5,
-      reviewCount: 1247,
-      inStock: true,
-      stockCount: 45,
-      profitabilityScore: 87,
-      trendPercentage: 15.3,
-      trendDirection: 'up',
-      description: 'Advanced fitness tracking smartwatch with GPS, heart rate monitoring, and 7-day battery life. Perfect for fitness enthusiasts and professionals.',
-      features: [
-        'GPS Tracking',
-        'Heart Rate Monitor',
-        'Sleep Tracking',
-        '7-Day Battery Life',
-        'Water Resistant (50m)',
-        'Smart Notifications'
-      ],
-      specifications: {
-        'Display': '1.4" AMOLED',
-        'Battery': '300mAh',
-        'Connectivity': 'Bluetooth 5.0',
-        'Sensors': 'GPS, Heart Rate, Accelerometer',
-        'Compatibility': 'iOS 12+, Android 8+'
-      },
-      images: [
-        '/api/placeholder/400/400',
-        '/api/placeholder/400/400',
-        '/api/placeholder/400/400',
-        '/api/placeholder/400/400'
-      ],
-      reviews: [
-        {
-          id: 1,
-          user: 'John D.',
-          rating: 5,
-          date: '2024-01-15',
-          comment: 'Excellent build quality and accurate tracking!'
-        },
-        {
-          id: 2,
-          user: 'Sarah M.',
-          rating: 4,
-          date: '2024-01-10',
-          comment: 'Great battery life, could have more watch faces.'
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/products/${id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch product");
         }
-      ]
+        const data = await response.json();
+        setProduct(data);
+      } catch (err) {
+        console.error("Error fetching product:", err);
+        setError("Failed to load product details");
+
+        // 🔹 Fallback mock product
+        setProduct({
+          _id: id,
+          name: "Smart LED Desk Lamp",
+          category: "Electronics",
+          price: { current: 89.99, currency: "USD" },
+          profitabilityScore: 85,
+          trendPercentage: 12,
+          description:
+            "Voice-controlled smart lamp with adjustable brightness and color temperature",
+          availability: { inStock: true, stockCount: 45 },
+          tags: ["smart-home", "led", "voice-control"],
+        });
+      } finally {
+        setLoading(false);
+      }
     };
-    setProduct(mockProduct);
-  }, [id]);
+
+    if (id) fetchProduct();
+  }, [id, API_BASE_URL]);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+          <span className="ml-2">Loading product details...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-center text-red-600">
+        <p>{error}</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
-      <div className="p-6">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold">Loading product...</h2>
-        </div>
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-semibold">Product not found</h2>
+        <button
+          onClick={() => navigate(-1)}
+          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+        >
+          Go Back
+        </button>
       </div>
     );
   }
@@ -89,24 +109,15 @@ const ProductDetails = () => {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Product Images */}
+        {/* Product Image Placeholder */}
         <div className="space-y-4">
           <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-            <img
-              src={product.images[0]}
-              alt={product.name}
-              className="w-full h-96 object-cover"
-            />
+            <div className="w-full h-96 bg-gray-100 flex items-center justify-center">
+              <Package className="w-16 h-16 text-gray-400" />
+            </div>
           </div>
-          <div className="grid grid-cols-4 gap-2">
-            {product.images.slice(1).map((img, index) => (
-              <img
-                key={index}
-                src={img}
-                alt={`${product.name} ${index + 2}`}
-                className="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-80"
-              />
-            ))}
+          <div className="text-center text-gray-500 text-sm">
+            Product image placeholder
           </div>
         </div>
 
@@ -121,35 +132,25 @@ const ProductDetails = () => {
             {/* Price */}
             <div className="flex items-center gap-3 mb-4">
               <span className="text-3xl font-bold text-indigo-600">
-                ${product.price}
+                ${product.price?.current || "N/A"}
               </span>
-              {product.originalPrice > product.price && (
-                <span className="text-lg text-gray-500 line-through">
-                  ${product.originalPrice}
-                </span>
-              )}
-              <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-sm font-medium">
-                Save ${(product.originalPrice - product.price).toFixed(2)}
+              <span className="text-sm text-gray-500">
+                {product.price?.currency || "USD"}
               </span>
-            </div>
-
-            {/* Rating */}
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                  />
-                ))}
-              </div>
-              <span className="text-gray-600">{product.rating} ({product.reviewCount} reviews)</span>
             </div>
 
             {/* Stock Status */}
             <div className="flex items-center gap-2 mb-6">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${product.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {product.inStock ? `In Stock (${product.stockCount})` : 'Out of Stock'}
+              <span
+                className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  product.availability?.inStock
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}
+              >
+                {product.availability?.inStock
+                  ? `In Stock (${product.availability?.stockCount || 0})`
+                  : "Out of Stock"}
               </span>
             </div>
           </div>
@@ -162,9 +163,13 @@ const ProductDetails = () => {
             </button>
             <button
               onClick={() => setIsLiked(!isLiked)}
-              className={`p-3 rounded-xl border-2 transition ${isLiked ? 'bg-red-50 border-red-200 text-red-600' : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600'}`}
+              className={`p-3 rounded-xl border-2 transition ${
+                isLiked
+                  ? "bg-red-50 border-red-200 text-red-600"
+                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+              }`}
             >
-              <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+              <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
             </button>
             <button className="p-3 rounded-xl border-2 bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 transition">
               <Share2 className="w-5 h-5" />
@@ -176,13 +181,15 @@ const ProductDetails = () => {
             <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-indigo-600">{product.profitabilityScore}%</div>
+                <div className="text-2xl font-bold text-indigo-600">
+                  {product.profitabilityScore || 0}%
+                </div>
                 <div className="text-sm text-gray-600">Profitability</div>
               </div>
               <div className="text-center">
-                <div className={`text-2xl font-bold flex items-center justify-center gap-1 ${product.trendDirection === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                  {product.trendDirection === 'up' ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
-                  {product.trendPercentage}%
+                <div className="text-2xl font-bold text-green-600 flex items-center justify-center gap-1">
+                  <TrendingUp className="w-5 h-5" />
+                  {product.trendPercentage || 0}%
                 </div>
                 <div className="text-sm text-gray-600">Trend</div>
               </div>
@@ -195,11 +202,15 @@ const ProductDetails = () => {
       <div className="mt-12">
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8">
-            {['overview', 'specifications', 'reviews'].map((tab) => (
+            {["overview", "specifications", "tags"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition ${activeTab === tab ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+                className={`py-2 px-1 border-b-2 font-medium text-sm transition ${
+                  activeTab === tab
+                    ? "border-indigo-500 text-indigo-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </button>
@@ -208,55 +219,90 @@ const ProductDetails = () => {
         </div>
 
         <div className="mt-6">
-          {activeTab === 'overview' && (
+          {activeTab === "overview" && (
             <div className="bg-white rounded-2xl shadow-md p-6">
               <h3 className="text-lg font-semibold mb-4">Product Overview</h3>
-              <p className="text-gray-700 leading-relaxed mb-4">{product.description}</p>
-              <h4 className="font-semibold mb-2">Key Features:</h4>
-              <ul className="list-disc list-inside space-y-1 text-gray-700">
-                {product.features.map((feature, index) => (
-                  <li key={index}>{feature}</li>
-                ))}
-              </ul>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                {product.description || "No description available"}
+              </p>
+              {product.tags?.length > 0 && (
+                <>
+                  <h4 className="font-semibold mb-2">Tags:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {product.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
-          {activeTab === 'specifications' && (
+          {activeTab === "specifications" && (
             <div className="bg-white rounded-2xl shadow-md p-6">
               <h3 className="text-lg font-semibold mb-4">Specifications</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(product.specifications).map(([key, value]) => (
-                  <div key={key} className="flex justify-between py-2 border-b border-gray-100">
-                    <span className="font-medium text-gray-700">{key}:</span>
-                    <span className="text-gray-900">{value}</span>
-                  </div>
-                ))}
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-700">Name:</span>
+                  <span className="text-gray-900">{product.name}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-700">Category:</span>
+                  <span className="text-gray-900">{product.category}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-700">Price:</span>
+                  <span className="text-gray-900">
+                    ${product.price?.current || "N/A"}{" "}
+                    {product.price?.currency || "USD"}
+                  </span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-700">
+                    Profitability:
+                  </span>
+                  <span className="text-gray-900">
+                    {product.profitabilityScore || 0}%
+                  </span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-700">Trend:</span>
+                  <span className="text-gray-900">
+                    +{product.trendPercentage || 0}%
+                  </span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="font-medium text-gray-700">Stock:</span>
+                  <span className="text-gray-900">
+                    {product.availability?.stockCount || 0}
+                  </span>
+                </div>
               </div>
             </div>
           )}
 
-          {activeTab === 'reviews' && (
+          {activeTab === "tags" && (
             <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Customer Reviews</h3>
-              <div className="space-y-4">
-                {product.reviews.map((review) => (
-                  <div key={review.id} className="border-b border-gray-100 pb-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-gray-800">{review.user}</span>
-                      <div className="flex items-center">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`w-4 h-4 ${i < review.rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-gray-600 text-sm">{review.date}</p>
-                    <p className="text-gray-700 mt-1">{review.comment}</p>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-lg font-semibold mb-4">Product Tags</h3>
+              {product.tags?.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {product.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-500">No tags available</p>
+              )}
             </div>
           )}
         </div>
