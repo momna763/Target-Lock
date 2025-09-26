@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -22,6 +22,9 @@ import Analytics from './pages/Analytics';
 import Chatbot from './pages/Chatbot';
 import AdminPanel from './pages/AdminPanel';
 import UserProfile from './pages/UserProfile';
+import ExcelReport from './pages/ExcelReport';
+import PDFReport from './pages/PDFReport';
+import CSVReport from './pages/CSVReport';
 
 const getTheme = (mode) => {
   const isDark = mode === 'dark';
@@ -71,6 +74,9 @@ const AppRoutes = ({ mode, toggleTheme }) => {
                 <Route path="/chatbot" element={<PrivateRoute><Chatbot /></PrivateRoute>} />
                 <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
                 <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
+                <Route path="/reports/excel" element={<PrivateRoute><ExcelReport /></PrivateRoute>} />
+                <Route path="/reports/pdf" element={<PrivateRoute><PDFReport /></PrivateRoute>} />
+                <Route path="/reports/csv" element={<PrivateRoute><CSVReport /></PrivateRoute>} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
             </MainLayout>
@@ -82,9 +88,41 @@ const AppRoutes = ({ mode, toggleTheme }) => {
 };
 
 const App = () => {
-  const [mode, setMode] = useState('light');
+  // Check system preference for theme
+  const getSystemTheme = () => {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  };
+
+  const [mode, setMode] = useState(() => {
+    // Check localStorage first, then system preference
+    const savedTheme = localStorage.getItem('theme');
+    return savedTheme || getSystemTheme();
+  });
+
   const theme = getTheme(mode);
-  const toggleTheme = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+  
+  const toggleTheme = () => {
+    const newMode = mode === 'light' ? 'dark' : 'light';
+    setMode(newMode);
+    localStorage.setItem('theme', newMode);
+  };
+
+  // Listen for system theme changes
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => {
+      // Only update if user hasn't manually set a preference
+      if (!localStorage.getItem('theme')) {
+        setMode(e.matches ? 'dark' : 'light');
+      }
+    };
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, []);
 
   return (
     <AuthProvider>

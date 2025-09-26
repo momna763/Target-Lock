@@ -1,7 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { FileSpreadsheet, FileText, FileBarChart2 } from "lucide-react";
 
 const Reports = () => {
+  const navigate = useNavigate();
+
   const reportOptions = [
     {
       id: 1,
@@ -10,6 +13,7 @@ const Reports = () => {
       icon: <FileSpreadsheet className="w-8 h-8 text-green-500" />,
       color: "from-green-50 to-green-100",
       btnColor: "bg-green-500 hover:bg-green-600",
+      route: "/reports/excel",
     },
     {
       id: 2,
@@ -18,6 +22,7 @@ const Reports = () => {
       icon: <FileText className="w-8 h-8 text-red-500" />,
       color: "from-red-50 to-red-100",
       btnColor: "bg-red-500 hover:bg-red-600",
+      route: "/reports/pdf",
     },
     {
       id: 3,
@@ -26,6 +31,7 @@ const Reports = () => {
       icon: <FileBarChart2 className="w-8 h-8 text-blue-500" />,
       color: "from-blue-50 to-blue-100",
       btnColor: "bg-blue-500 hover:bg-blue-600",
+      route: "/reports/csv",
     },
   ];
 
@@ -54,6 +60,7 @@ const Reports = () => {
 
             {/* Action Button */}
             <button
+              onClick={() => navigate(report.route)}
               className={`${report.btnColor} text-white px-4 py-2 rounded-lg font-medium transition w-full`}
             >
               Generate & Download

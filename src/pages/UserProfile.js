@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { User, Mail, LogOut } from 'lucide-react';
 import { Alert } from '@mui/material';
@@ -9,23 +9,51 @@ import { Alert } from '@mui/material';
 const UserProfile = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState({ name: '', email: '' });
+  const [profile, setProfile] = useState({ 
+    name: '', 
+    email: ''
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
+
   useEffect(() => {
     if (currentUser) {
-      const userDocRef = doc(db, 'users', currentUser.uid);
-      getDoc(userDocRef).then(docSnap => {
-        if (docSnap.exists()) {
-          setProfile(docSnap.data());
-        } else {
-          console.log('No such document!');
-        }
-      });
+      fetchUserProfile();
     }
   }, [currentUser]);
+
+  const fetchUserProfile = async () => {
+    try {
+      const userDocRef = doc(db, 'users', currentUser.uid);
+      const docSnap = await getDoc(userDocRef);
+      
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
+        setProfile({
+          name: userData.name || currentUser.displayName || '',
+          email: userData.email || currentUser.email
+        });
+      } else {
+        // Create initial profile with basic info
+        const initialProfile = {
+          name: currentUser.displayName || '',
+          email: currentUser.email,
+          createdAt: new Date().toISOString()
+        };
+        await setDoc(userDocRef, initialProfile);
+        setProfile({
+          name: initialProfile.name,
+          email: initialProfile.email
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      setError('Failed to load profile data');
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -49,7 +77,12 @@ const UserProfile = () => {
 
     try {
       const userDocRef = doc(db, 'users', currentUser.uid);
-      await updateDoc(userDocRef, { name: profile.name });
+      const updateData = {
+        name: profile.name,
+        updatedAt: new Date().toISOString()
+      };
+      
+      await updateDoc(userDocRef, updateData);
       setSuccess('Profile updated successfully!');
     } catch (err) {
       setError('Failed to update profile.');
@@ -66,8 +99,8 @@ const UserProfile = () => {
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <div className="mb-6 text-center">
-        <h2 className="text-2xl font-semibold text-gray-800">User Profile & Settings</h2>
-        <p className="text-gray-600">Edit your profile and manage preferences.</p>
+        <h2 className="text-2xl font-semibold text-gray-800">User Profile</h2>
+        <p className="text-gray-600">Manage your basic profile information</p>
       </div>
 
       <div className="bg-white rounded-2xl shadow p-6 mb-8 flex flex-col items-center">
@@ -94,6 +127,7 @@ const UserProfile = () => {
               value={profile.name}
               onChange={handleChange}
               className="w-full outline-none bg-transparent"
+              placeholder="Enter your full name"
             />
           </div>
         </div>
@@ -109,6 +143,7 @@ const UserProfile = () => {
               className="w-full outline-none bg-transparent"
             />
           </div>
+          <p className="text-sm text-gray-500 mt-1">Email cannot be changed</p>
         </div>
 
         <button

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useTheme } from '@mui/material/styles';
 import {
   LineChart,
   Line,
@@ -25,6 +26,9 @@ import {
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 export default function Dashboard() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  
   const [metrics, setMetrics] = useState({
     totalProducts: 0,
     avgProfitability: 0,
@@ -138,7 +142,7 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="p-6 bg-gray-950 min-h-screen text-white">
+      <div className={`p-6 min-h-screen ${isDark ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
         <LoadingSpinner />
       </div>
     );
@@ -146,14 +150,14 @@ export default function Dashboard() {
 
   if (error) {
     return (
-      <div className="p-6 bg-gray-950 min-h-screen text-white">
+      <div className={`p-6 min-h-screen ${isDark ? 'bg-gray-950 text-white' : 'bg-gray-50 text-gray-900'}`}>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Dashboard</h1>
           <button
-            onClick={handleRefresh}
-            className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center"
+            onClick={fetchData}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-4 h-4" />
             Retry
           </button>
         </div>
@@ -163,93 +167,149 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="p-6 bg-gray-950 min-h-screen text-white">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <button
-          onClick={handleRefresh}
-          className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg flex items-center"
-        >
-          <RefreshCw className="w-4 h-4 mr-2" />
-          Refresh
-        </button>
-      </div>
-
-      {/* Row 1: Metrics + Trending Products */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Metrics Cards */}
-        <div className="grid grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-800 hover:scale-105 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center space-x-4">
-              <Package className="w-7 h-7 text-indigo-400" />
-              <div>
-                <p className="text-gray-400 text-sm">Total Products</p>
-                <p className="text-2xl font-bold">{metrics.totalProducts.toLocaleString()}</p>
-              </div>
+    <div className={`min-h-screen ${isDark ? 'text-white' : 'text-gray-900'}`}>
+      {/* Hero Header */}
+      <div className={`relative overflow-hidden rounded-3xl mb-8 ${isDark ? 'bg-gradient-to-r from-purple-900 via-blue-900 to-indigo-900' : 'bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600'}`}>
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative px-8 py-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                  <BarChart3 className="w-8 h-8" />
+                </div>
+                Dashboard
+              </h1>
+              <p className="text-white/80 text-lg">AI-powered insights for your product hunting journey</p>
             </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-800 hover:scale-105 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center space-x-4">
-              <TrendingUp className="w-7 h-7 text-green-400" />
-              <div>
-                <p className="text-gray-400 text-sm">Avg Profitability</p>
-                <p className="text-2xl font-bold">{metrics.avgProfitability}%</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-800 hover:scale-105 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center space-x-4">
-              <Users className="w-7 h-7 text-pink-400" />
-              <div>
-                <p className="text-gray-400 text-sm">Trending This Week</p>
-                <p className="text-2xl font-bold">{metrics.trendingThisWeek}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-800 hover:scale-105 hover:shadow-2xl transition-all duration-300">
-            <div className="flex items-center space-x-4">
-              <ShoppingBag className="w-7 h-7 text-orange-400" />
-              <div>
-                <p className="text-gray-400 text-sm">Top Category</p>
-                <p className="text-2xl font-bold">{metrics.topCategory}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Trending Products Horizontal Cards */}
-        <div className="flex space-x-6 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700">
-          {trendingProducts.map((product, i) => (
-            <div
-              key={i}
-              className="min-w-[200px] bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-xl p-5 rounded-2xl shadow-lg hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 border border-gray-800"
+            <button
+              onClick={handleRefresh}
+              className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white px-6 py-3 rounded-2xl flex items-center gap-2 transition-all duration-300 hover:scale-105 border border-white/20"
             >
-              <div className="h-24 bg-gray-800 rounded-xl mb-3 flex items-center justify-center text-gray-500">
-                📦
+              <RefreshCw className="w-5 h-5" />
+              Refresh Data
+            </button>
+          </div>
+        </div>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+      </div>
+
+      {/* Row 1: Metrics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Total Products Card */}
+        <div className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isDark ? 'bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-500/20' : 'bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-200'}`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-2xl ${isDark ? 'bg-indigo-500/20' : 'bg-indigo-100'}`}>
+                <Package className={`w-6 h-6 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
               </div>
-              <h3 className="text-lg font-semibold">{product.name}</h3>
-              <p className="text-gray-400 text-sm">{product.category}</p>
-              <span className="text-green-400 font-bold">{product.trend}</span>
+              <TrendingUp className={`w-5 h-5 ${isDark ? 'text-green-400' : 'text-green-500'}`} />
             </div>
-          ))}
+            <div className="space-y-1">
+              <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Total Products</p>
+              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{metrics.totalProducts}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Average Profitability Card */}
+        <div className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isDark ? 'bg-gradient-to-br from-emerald-900/50 to-teal-900/50 border border-emerald-500/20' : 'bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-200'}`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-2xl ${isDark ? 'bg-emerald-500/20' : 'bg-emerald-100'}`}>
+                <BarChart3 className={`w-6 h-6 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`} />
+              </div>
+              <TrendingUp className={`w-5 h-5 ${isDark ? 'text-green-400' : 'text-green-500'}`} />
+            </div>
+            <div className="space-y-1">
+              <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Avg Profitability</p>
+              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{metrics.avgProfitability}%</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Trending This Week Card */}
+        <div className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isDark ? 'bg-gradient-to-br from-orange-900/50 to-red-900/50 border border-orange-500/20' : 'bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200'}`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-2xl ${isDark ? 'bg-orange-500/20' : 'bg-orange-100'}`}>
+                <TrendingUp className={`w-6 h-6 ${isDark ? 'text-orange-400' : 'text-orange-600'}`} />
+              </div>
+              <TrendingUp className={`w-5 h-5 ${isDark ? 'text-green-400' : 'text-green-500'}`} />
+            </div>
+            <div className="space-y-1">
+              <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Trending This Week</p>
+              <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{metrics.trendingThisWeek}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Category Card */}
+        <div className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${isDark ? 'bg-gradient-to-br from-pink-900/50 to-purple-900/50 border border-pink-500/20' : 'bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-200'}`}>
+          <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div className="relative z-10">
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-2xl ${isDark ? 'bg-pink-500/20' : 'bg-pink-100'}`}>
+                <ShoppingBag className={`w-6 h-6 ${isDark ? 'text-pink-400' : 'text-pink-600'}`} />
+              </div>
+              <TrendingUp className={`w-5 h-5 ${isDark ? 'text-green-400' : 'text-green-500'}`} />
+            </div>
+            <div className="space-y-1">
+              <p className={`text-sm font-medium ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Top Category</p>
+              <p className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{metrics.topCategory}</p>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Row 2: Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Row 2: Trending Products */}
+      <div className="mb-8">
+        <div className={`rounded-3xl p-8 ${isDark ? 'bg-gradient-to-br from-gray-900/50 to-gray-800/50 border border-gray-700/50' : 'bg-white/70 border border-gray-200/50'} backdrop-blur-xl shadow-2xl`}>
+          <h2 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`p-2 rounded-xl ${isDark ? 'bg-purple-500/20' : 'bg-purple-100'}`}>
+              <TrendingUp className={`w-6 h-6 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
+            </div>
+            🔥 Trending Products
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {trendingProducts.map((product, index) => (
+              <div
+                key={index}
+                className={`group p-4 rounded-2xl transition-all duration-300 hover:scale-105 ${isDark ? 'bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50' : 'bg-white/80 hover:bg-white border border-gray-200/50'} backdrop-blur-sm shadow-lg hover:shadow-xl`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className={`font-semibold text-lg ${isDark ? 'text-white' : 'text-gray-900'}`}>{product.name}</h3>
+                  <span className="px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-bold rounded-full">
+                    {product.trend}
+                  </span>
+                </div>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>{product.category}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Row 3: Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Line Chart */}
-        <div className="bg-gray-900/70 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-800">
-          <h2 className="text-xl font-semibold mb-4">
+        <div className={`${isDark ? 'bg-gray-900/50 border-gray-700/50' : 'bg-white/70 border-gray-200/50'} backdrop-blur-xl p-8 rounded-3xl shadow-2xl border`}>
+          <h2 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`p-2 rounded-xl ${isDark ? 'bg-blue-500/20' : 'bg-blue-100'}`}>
+              <BarChart3 className={`w-6 h-6 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
+            </div>
             📈 Products Trending Over Time
           </h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-              <XAxis dataKey="name" stroke="#9ca3af" />
-              <YAxis stroke="#9ca3af" />
+              <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
+              <XAxis dataKey="name" stroke={isDark ? "#9ca3af" : "#6b7280"} />
+              <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} />
               <Tooltip />
               <Line
                 type="monotone"
@@ -263,8 +323,13 @@ export default function Dashboard() {
         </div>
 
         {/* Pie Chart */}
-        <div className="bg-gray-900/70 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-gray-800">
-          <h2 className="text-xl font-semibold mb-4">🥧 Category Distribution</h2>
+        <div className={`${isDark ? 'bg-gray-900/50 border-gray-700/50' : 'bg-white/70 border-gray-200/50'} backdrop-blur-xl p-8 rounded-3xl shadow-2xl border`}>
+          <h2 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`p-2 rounded-xl ${isDark ? 'bg-purple-500/20' : 'bg-purple-100'}`}>
+              <Package className={`w-6 h-6 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
+            </div>
+            🥧 Category Distribution
+          </h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
@@ -286,4 +351,4 @@ export default function Dashboard() {
       </div>
     </div>
   );
-}
+};

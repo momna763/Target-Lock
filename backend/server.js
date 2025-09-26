@@ -100,6 +100,20 @@ app.post("/api/products", async (req, res) => {
   }
 });
 
+// Get trending products (top 5 by profitability) - MUST come before /:id route
+app.get("/api/products/trending", async (req, res) => {
+  try {
+    const products = await Product.find()
+      .sort({ profitabilityScore: -1 })
+      .limit(5)
+      .lean();
+    res.json(products);
+  } catch (error) {
+    console.error("Get trending products error:", error);
+    res.status(500).json({ error: "Failed to fetch trending products" });
+  }
+});
+
 // Get all products with filtering
 app.get("/api/products", async (req, res) => {
   try {
@@ -121,17 +135,17 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-// Get trending products (top 5 by profitability)
-app.get("/api/products/trending", async (req, res) => {
+// Get single product by ID
+app.get("/api/products/:id", async (req, res) => {
   try {
-    const products = await Product.find()
-      .sort({ profitabilityScore: -1 })
-      .limit(5)
-      .lean();
-    res.json(products);
+    const product = await Product.findById(req.params.id).lean();
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+    res.json(product);
   } catch (error) {
-    console.error("Get trending products error:", error);
-    res.status(500).json({ error: "Failed to fetch trending products" });
+    console.error("Get product by ID error:", error);
+    res.status(500).json({ error: "Failed to fetch product" });
   }
 });
 

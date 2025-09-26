@@ -151,12 +151,24 @@ const ProductSearch = () => {
   }
 
   return (
-    <div className="p-6 space-y-8">
+    <div className="space-y-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-8 text-white">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative z-10">
+          <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
+            <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+              <Search className="w-8 h-8" />
+            </div>
+            Product Search & Discovery
+          </h1>
+          <p className="text-white/80 text-lg">Find and analyze the most profitable products with AI-powered insights</p>
+        </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+      </div>
+
       {/* Search + Filters */}
-      <div className="bg-white shadow-md rounded-2xl p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-          Product Search & Discovery
-        </h2>
+      <div className="bg-white/80 backdrop-blur-xl shadow-2xl rounded-3xl p-8 border border-gray-200/50">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -238,35 +250,49 @@ const ProductSearch = () => {
       </div>
 
       {/* Product Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {filteredProducts.map((product) => (
           <div
             key={product._id}
-            className="bg-white rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 p-5"
+            className="group bg-white/80 backdrop-blur-xl rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 p-6 border border-gray-200/50"
           >
-            <div className="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-              <Package className="w-12 h-12 text-gray-400" />
+            <div className="w-full h-40 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center mb-4 group-hover:from-indigo-100 group-hover:to-purple-100 transition-all duration-300">
+              <Package className="w-16 h-16 text-gray-400 group-hover:text-indigo-500 transition-colors duration-300" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-800">
-              {product.name}
-            </h3>
-            <p className="text-sm text-gray-500">{product.category}</p>
-            <p className="text-sm text-gray-500 mb-2">
-              ${product.price?.current || "N/A"}{" "}
-              {product.price?.currency || "USD"}
-            </p>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-indigo-600">
-                {product.profitabilityScore || 0}% profitability
-              </span>
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300">
+                {product.name}
+              </h3>
+              <div className="flex items-center justify-between">
+                <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm font-medium">
+                  {product.category}
+                </span>
+                <span className="text-lg font-bold text-gray-900">
+                  ${product.price?.current || "N/A"}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-600">Profitability</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(product.profitabilityScore || 0, 100)}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm font-bold text-emerald-600">
+                    {product.profitabilityScore || 0}%
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => handleViewDetails(product._id)}
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+              >
+                <Eye className="w-4 h-4" />
+                View Details
+              </button>
             </div>
-            <button
-              onClick={() => handleViewDetails(product._id)}
-              className="w-full py-2 rounded-lg bg-indigo-50 text-indigo-600 font-medium hover:bg-indigo-100 transition flex items-center justify-center gap-2"
-            >
-              <Eye className="w-4 h-4" />
-              View Details
-            </button>
           </div>
         ))}
       </div>
