@@ -114,17 +114,76 @@ app.get("/api/products/trending", async (req, res) => {
   }
 });
 
-// Get all products with filtering
-app.get("/api/products", async (req, res) => {
+// Get products by category (new route with specific prefix)
+app.get("/api/products/category/:category", async (req, res) => {
   try {
-    const { category, minProfitability, limit = 50 } = req.query;
-    let query = {};
-
-    if (category) query.category = category;
+    const { category } = req.params;
+    const { limit = 50, sort = "-scrapedAt", minProfitability } = req.query;
+    
+    let query = { category: category.toLowerCase() };
     if (minProfitability) query.profitabilityScore = { $gte: parseInt(minProfitability) };
 
+    // Handle different sort options
+    let sortOption = {};
+    switch (sort) {
+      case "-scrapedAt":
+        sortOption = { scrapedAt: -1 };
+        break;
+      case "-profitabilityScore":
+        sortOption = { profitabilityScore: -1 };
+        break;
+      case "price":
+        sortOption = { price: 1 };
+        break;
+      case "-price":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { scrapedAt: -1 };
+    }
+
     const products = await Product.find(query)
-      .sort({ profitabilityScore: -1 })
+      .sort(sortOption)
+      .limit(parseInt(limit))
+      .lean();
+
+    res.json(products);
+  } catch (error) {
+    console.error("Get products by category error:", error);
+    res.status(500).json({ error: "Failed to fetch products by category" });
+  }
+});
+
+// Get all products with filtering (updated)
+app.get("/api/products", async (req, res) => {
+  try {
+    const { category, minProfitability, limit = 50, sort = "-scrapedAt" } = req.query;
+    let query = {};
+
+    if (category) query.category = category.toLowerCase();
+    if (minProfitability) query.profitabilityScore = { $gte: parseInt(minProfitability) };
+
+    // Handle different sort options
+    let sortOption = {};
+    switch (sort) {
+      case "-scrapedAt":
+        sortOption = { scrapedAt: -1 };
+        break;
+      case "-profitabilityScore":
+        sortOption = { profitabilityScore: -1 };
+        break;
+      case "price":
+        sortOption = { price: 1 };
+        break;
+      case "-price":
+        sortOption = { price: -1 };
+        break;
+      default:
+        sortOption = { scrapedAt: -1 };
+    }
+
+    const products = await Product.find(query)
+      .sort(sortOption)
       .limit(parseInt(limit))
       .lean();
 
@@ -132,6 +191,25 @@ app.get("/api/products", async (req, res) => {
   } catch (error) {
     console.error("Get products error:", error);
     res.status(500).json({ error: "Failed to fetch products" });
+  }
+});
+
+// Get available categories
+app.get("/api/categories", async (req, res) => {
+  try {
+    const categories = await Product.distinct("category");
+    const categoryStats = await Product.aggregate([
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+    
+    res.json({
+      categories: categories.sort(),
+      stats: categoryStats
+    });
+  } catch (error) {
+    console.error("Get categories error:", error);
+    res.status(500).json({ error: "Failed to fetch categories" });
   }
 });
 

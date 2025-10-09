@@ -6,11 +6,9 @@ import { LogOut, Zap, Target } from 'lucide-react';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import SearchIcon from '@mui/icons-material/Search';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import RecommendIcon from '@mui/icons-material/Recommend';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ReportIcon from '@mui/icons-material/Description';
 import ChatIcon from '@mui/icons-material/Chat';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -21,11 +19,9 @@ const navItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Product Search', icon: <SearchIcon />, path: '/search' },
   { text: 'Trending', icon: <TrendingUpIcon />, path: '/trending' },
-  { text: 'Recommendations', icon: <RecommendIcon />, path: '/recommendations' },
   { text: 'Reports', icon: <ReportIcon />, path: '/reports' },
   { text: 'Analytics', icon: <BarChartIcon />, path: '/analytics' },
   { text: 'Chatbot', icon: <ChatIcon />, path: '/chatbot' },
-  { text: 'Admin Panel', icon: <AdminPanelSettingsIcon />, path: '/admin' },
   { text: 'Profile', icon: <AccountCircleIcon />, path: '/profile' },
 ];
 

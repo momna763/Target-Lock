@@ -16,11 +16,9 @@ import Dashboard from './pages/Dashboard';
 import ProductSearch from './pages/ProductSearch';
 import TrendingProducts from './pages/TrendingProducts';
 import ProductDetails from './pages/ProductDetails';
-import Recommendations from './pages/Recommendations';
 import Reports from './pages/Reports';
 import Analytics from './pages/Analytics';
 import Chatbot from './pages/Chatbot';
-import AdminPanel from './pages/AdminPanel';
 import UserProfile from './pages/UserProfile';
 import ExcelReport from './pages/ExcelReport';
 import PDFReport from './pages/PDFReport';
@@ -68,11 +66,9 @@ const AppRoutes = ({ mode, toggleTheme }) => {
                 <Route path="/search" element={<PrivateRoute><ProductSearch /></PrivateRoute>} />
                 <Route path="/trending" element={<PrivateRoute><TrendingProducts /></PrivateRoute>} />
                 <Route path="/product/:id" element={<PrivateRoute><ProductDetails /></PrivateRoute>} />
-                <Route path="/recommendations" element={<PrivateRoute><Recommendations /></PrivateRoute>} />
                 <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
                 <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
                 <Route path="/chatbot" element={<PrivateRoute><Chatbot /></PrivateRoute>} />
-                <Route path="/admin" element={<PrivateRoute><AdminPanel /></PrivateRoute>} />
                 <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
                 <Route path="/reports/excel" element={<PrivateRoute><ExcelReport /></PrivateRoute>} />
                 <Route path="/reports/pdf" element={<PrivateRoute><PDFReport /></PrivateRoute>} />

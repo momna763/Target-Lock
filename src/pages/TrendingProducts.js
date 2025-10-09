@@ -121,24 +121,44 @@ const TrendingProducts = () => {
             key={product._id}
             className="bg-white rounded-2xl shadow-md hover:shadow-xl transition transform hover:-translate-y-1 p-5"
           >
-            {/* Image placeholder */}
-            <div className="w-full h-32 bg-gray-100 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-gray-400">📦</span>
+            {/* Product Image */}
+            <div className="w-full h-32 bg-gray-100 rounded-lg overflow-hidden mb-4">
+              {product.imageUrl ? (
+                <img
+                  src={product.imageUrl}
+                  alt={product.name}
+                  className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div className="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center" style={{display: product.imageUrl ? 'none' : 'flex'}}>
+                <span className="text-gray-400 text-2xl">📱</span>
+              </div>
             </div>
 
             {/* Product Info */}
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-gray-800 line-clamp-2 mb-2">
               {product.name}
             </h3>
-            <p className="text-sm text-gray-500 mb-2">{product.category}</p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-500">{product.category}</p>
+              {product.price?.current && (
+                <span className="text-sm font-bold text-gray-900">
+                  {product.price.currency} {product.price.current.toLocaleString()}
+                </span>
+              )}
+            </div>
 
             {/* Badges */}
-            <div className="flex gap-2 mb-4">
-              <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                +{product.trendPercentage}%
+            <div className="flex flex-wrap gap-1 mb-4">
+              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                +{product.trendPercentage}% trend
               </span>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
+                className={`px-2 py-1 rounded-full text-xs font-medium ${
                   getProfitabilityLevel(product.profitabilityScore) === "High"
                     ? "bg-indigo-100 text-indigo-700"
                     : getProfitabilityLevel(product.profitabilityScore) === "Medium"
@@ -146,8 +166,13 @@ const TrendingProducts = () => {
                     : "bg-red-100 text-red-700"
                 }`}
               >
-                {getProfitabilityLevel(product.profitabilityScore)} Profitability
+                {product.profitabilityScore}% profit
               </span>
+              {product.tags?.[0] && product.tags[0] !== 'Mobile' && (
+                <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                  {product.tags[0]}
+                </span>
+              )}
             </div>
 
             {/* Button */}

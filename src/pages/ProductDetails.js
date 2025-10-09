@@ -3,10 +3,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   TrendingUp,
-  ShoppingCart,
   Heart,
   Share2,
   Package,
+  Star,
+  User,
+  ExternalLink,
 } from "lucide-react";
 
 const ProductDetails = () => {
@@ -14,11 +16,10 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // ✅ Consistent API base URL
+  // API base URL
   const API_BASE_URL =
     process.env.REACT_APP_API_URL || "http://localhost:5001/api";
 
@@ -37,7 +38,7 @@ const ProductDetails = () => {
         console.error("Error fetching product:", err);
         setError("Failed to load product details");
 
-        // 🔹 Fallback mock product
+        // Fallback mock product
         setProduct({
           _id: id,
           name: "Smart LED Desk Lamp",
@@ -98,213 +99,198 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="p-6">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 mb-6 transition"
-      >
-        <ArrowLeft className="w-5 h-5" />
-        Back
-      </button>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Product Image Placeholder */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl shadow-md overflow-hidden">
-            <div className="w-full h-96 bg-gray-100 flex items-center justify-center">
-              <Package className="w-16 h-16 text-gray-400" />
-            </div>
-          </div>
-          <div className="text-center text-gray-500 text-sm">
-            Product image placeholder
-          </div>
-        </div>
-
-        {/* Product Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">
-              {product.name}
-            </h1>
-            <p className="text-lg text-gray-600 mb-4">{product.category}</p>
-
-            {/* Price */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl font-bold text-indigo-600">
-                ${product.price?.current || "N/A"}
-              </span>
-              <span className="text-sm text-gray-500">
-                {product.price?.currency || "USD"}
-              </span>
-            </div>
-
-            {/* Stock Status */}
-            <div className="flex items-center gap-2 mb-6">
-              <span
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  product.availability?.inStock
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {product.availability?.inStock
-                  ? `In Stock (${product.availability?.stockCount || 0})`
-                  : "Out of Stock"}
-              </span>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3">
-            <button className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-xl font-medium transition flex items-center justify-center gap-2">
-              <ShoppingCart className="w-5 h-5" />
-              Add to Cart
-            </button>
-            <button
-              onClick={() => setIsLiked(!isLiked)}
-              className={`p-3 rounded-xl border-2 transition ${
-                isLiked
-                  ? "bg-red-50 border-red-200 text-red-600"
-                  : "bg-gray-50 border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600"
-              }`}
-            >
-              <Heart className={`w-5 h-5 ${isLiked ? "fill-current" : ""}`} />
-            </button>
-            <button className="p-3 rounded-xl border-2 bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100 transition">
-              <Share2 className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="bg-white rounded-2xl shadow-md p-6">
-            <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-indigo-600">
-                  {product.profitabilityScore || 0}%
-                </div>
-                <div className="text-sm text-gray-600">Profitability</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 flex items-center justify-center gap-1">
-                  <TrendingUp className="w-5 h-5" />
-                  {product.trendPercentage || 0}%
-                </div>
-                <div className="text-sm text-gray-600">Trend</div>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+      {/* Header with Back Button */}
+      <div className="bg-white/80 backdrop-blur-xl shadow-sm border-b border-gray-200/50 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition font-medium"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back to Products
+          </button>
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <div className="mt-12">
-        <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
-            {["overview", "specifications", "tags"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition ${
-                  activeTab === tab
-                    ? "border-indigo-500 text-indigo-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        <div className="mt-6">
-          {activeTab === "overview" && (
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Product Overview</h3>
-              <p className="text-gray-700 leading-relaxed mb-4">
-                {product.description || "No description available"}
-              </p>
-              {product.tags?.length > 0 && (
-                <>
-                  <h4 className="font-semibold mb-2">Tags:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {product.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Hero Section */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/50 overflow-hidden mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            {/* Product Image */}
+            <div className="relative">
+              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                {(product.image || product.imageUrl) ? (
+                  <img
+                    src={product.image || product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center" style={{display: (product.image || product.imageUrl) ? 'none' : 'flex'}}>
+                  <Package className="w-24 h-24 text-gray-400" />
+                </div>
+              </div>
+              
+              {/* Category Badge */}
+              <div className="absolute top-4 left-4">
+                <span className="px-4 py-2 bg-white/90 backdrop-blur-sm text-gray-700 rounded-full text-sm font-medium capitalize shadow-lg">
+                  {product.category}
+                </span>
+              </div>
+              
+              {/* Rating Badge */}
+              {product.ratingScore && (
+                <div className="absolute top-4 right-4">
+                  <div className="flex items-center gap-1 px-3 py-2 bg-yellow-500/90 backdrop-blur-sm text-white rounded-full text-sm font-medium shadow-lg">
+                    <Star className="w-4 h-4 fill-current" />
+                    <span>{parseFloat(product.ratingScore).toFixed(1)}</span>
                   </div>
-                </>
+                </div>
               )}
             </div>
-          )}
 
-          {activeTab === "specifications" && (
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Specifications</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700">Name:</span>
-                  <span className="text-gray-900">{product.name}</span>
+            {/* Product Info */}
+            <div className="p-8 lg:p-12">
+              <div className="space-y-6">
+                {/* Title and Price */}
+                <div>
+                  <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+                    {product.name}
+                  </h1>
+                  
+                  <div className="flex items-center gap-4 mb-6">
+                    <span className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                      {product.price ? 
+                        `PKR ${typeof product.price === 'string' ? parseInt(product.price.replace(/,/g, '')).toLocaleString() : product.price.toLocaleString()}` : 
+                        product.price?.current ? 
+                          `${product.price.currency} ${product.price.current.toLocaleString()}` : 
+                          "Price N/A"
+                      }
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700">Category:</span>
-                  <span className="text-gray-900">{product.category}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700">Price:</span>
-                  <span className="text-gray-900">
-                    ${product.price?.current || "N/A"}{" "}
-                    {product.price?.currency || "USD"}
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700">
-                    Profitability:
-                  </span>
-                  <span className="text-gray-900">
-                    {product.profitabilityScore || 0}%
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700">Trend:</span>
-                  <span className="text-gray-900">
-                    +{product.trendPercentage || 0}%
-                  </span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-700">Stock:</span>
-                  <span className="text-gray-900">
-                    {product.availability?.stockCount || 0}
-                  </span>
+
+                {/* Seller and Reviews */}
+                {(product.sellerName || product.review) && (
+                  <div className="bg-gradient-to-r from-gray-50 to-indigo-50 rounded-2xl p-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {product.sellerName && (
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-indigo-100 rounded-lg">
+                            <User className="w-5 h-5 text-indigo-600" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Seller</p>
+                            <p className="font-semibold text-gray-900">{product.sellerName}</p>
+                          </div>
+                        </div>
+                      )}
+                      
+                      {product.review && (
+                        <div className="flex items-center gap-3">
+                          <div className="p-2 bg-yellow-100 rounded-lg">
+                            <Star className="w-5 h-5 text-yellow-600 fill-current" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600">Reviews</p>
+                            <p className="font-semibold text-gray-900">{product.review} reviews</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-4">
+                  {(product.productUrl || product.metadata?.url) && (
+                    <a
+                      href={product.productUrl || product.metadata?.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl hover:from-green-700 hover:to-emerald-700 transition font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
+                    >
+                      <ExternalLink className="w-5 h-5" />
+                      View on Daraz
+                    </a>
+                  )}
+                  
+                  <button
+                    onClick={() => setIsLiked(!isLiked)}
+                    className={`p-4 rounded-2xl border-2 transition transform hover:scale-105 ${
+                      isLiked
+                        ? "bg-red-50 border-red-200 text-red-600 shadow-lg"
+                        : "bg-white border-gray-200 text-gray-600 hover:bg-red-50 hover:border-red-200 hover:text-red-600 shadow-md hover:shadow-lg"
+                    }`}
+                  >
+                    <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
+                  </button>
+                  
+                  <button className="p-4 rounded-2xl border-2 bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:shadow-lg transition transform hover:scale-105 shadow-md">
+                    <Share2 className="w-6 h-6" />
+                  </button>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        </div>
 
-          {activeTab === "tags" && (
-            <div className="bg-white rounded-2xl shadow-md p-6">
-              <h3 className="text-lg font-semibold mb-4">Product Tags</h3>
-              {product.tags?.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {product.tags.map((tag, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-500">No tags available</p>
-              )}
+        {/* Analytics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Profitability Card */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8 text-center transform hover:scale-105 transition">
+            <div className="p-4 bg-gradient-to-r from-indigo-100 to-purple-100 rounded-2xl mb-4 inline-block">
+              <TrendingUp className="w-8 h-8 text-indigo-600" />
             </div>
-          )}
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Profitability Score</h3>
+            <p className="text-4xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              {product.profitabilityScore || 0}%
+            </p>
+            <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${product.profitabilityScore || 0}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Trend Card */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8 text-center transform hover:scale-105 transition">
+            <div className="p-4 bg-gradient-to-r from-green-100 to-emerald-100 rounded-2xl mb-4 inline-block">
+              <TrendingUp className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Trend Growth</h3>
+            <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+              +{product.trendPercentage || 0}%
+            </p>
+            <div className="mt-4 w-full bg-gray-200 rounded-full h-2">
+              <div 
+                className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full transition-all duration-500"
+                style={{ width: `${Math.min(product.trendPercentage || 0, 100)}%` }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Source Info Card */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl border border-gray-200/50 p-8 text-center transform hover:scale-105 transition">
+            <div className="p-4 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-2xl mb-4 inline-block">
+              <Package className="w-8 h-8 text-blue-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">Data Source</h3>
+            <p className="text-xl font-bold text-blue-600 mb-2">
+              {product.source || "Daraz.pk"}
+            </p>
+            {product.scrapedAt && (
+              <p className="text-sm text-gray-600">
+                Updated: {new Date(product.scrapedAt).toLocaleDateString()}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>
