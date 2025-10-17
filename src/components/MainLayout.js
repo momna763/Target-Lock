@@ -9,6 +9,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import ReportIcon from '@mui/icons-material/Description';
 import ChatIcon from '@mui/icons-material/Chat';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
@@ -19,6 +20,7 @@ const navItems = [
   { text: 'Dashboard', icon: <DashboardIcon />, path: '/' },
   { text: 'Product Search', icon: <SearchIcon />, path: '/search' },
   { text: 'Trending', icon: <TrendingUpIcon />, path: '/trending' },
+  { text: 'Favourites', icon: <FavoriteIcon />, path: '/favourites' },
   { text: 'Reports', icon: <ReportIcon />, path: '/reports' },
   { text: 'Analytics', icon: <BarChartIcon />, path: '/analytics' },
   { text: 'Chatbot', icon: <ChatIcon />, path: '/chatbot' },

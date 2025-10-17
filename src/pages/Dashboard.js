@@ -60,10 +60,11 @@ export default function Dashboard() {
       setError(null);
 
       // Fetch all data in parallel
-      const [metricsData, productsData, trendsData] = await Promise.all([
+      const [metricsData, productsData, trendsData, categoriesData] = await Promise.all([
         apiCall('/metrics').catch(() => ({})),
         apiCall('/products?limit=20').catch(() => []),
         apiCall('/products/trending').catch(() => []),
+        apiCall('/categories').catch(() => ({ stats: [] })),
       ]);
 
       // Update metrics
@@ -75,29 +76,21 @@ export default function Dashboard() {
         marketsCovered: metricsData.marketsCovered || 0,
       });
 
-      // Update trending products
+      // Update trending products (use actual trending data from API)
       setTrendingProducts(
-        productsData.slice(0, 4).map((product) => ({
+        trendsData.slice(0, 4).map((product) => ({
           name: product.name,
           category: product.category,
-          trend: `+${Math.floor(Math.random() * 20)}%`, // You can calculate this from trend data
+          trend: `+${product.trendPercentage || 0}%`,
           profitabilityScore: product.profitabilityScore,
         }))
       );
 
-      // Generate chart data from products (group by category)
-      const categoryMap = {};
-      productsData.forEach((product) => {
-        if (!categoryMap[product.category]) {
-          categoryMap[product.category] = 0;
-        }
-        categoryMap[product.category] += 1;
-      });
-
+      // Use real category data from API
       setCategoryData(
-        Object.entries(categoryMap).map(([name, value]) => ({
-          name,
-          value,
+        categoriesData.stats.map((cat) => ({
+          name: cat._id.charAt(0).toUpperCase() + cat._id.slice(1),
+          value: cat.count,
         }))
       );
 

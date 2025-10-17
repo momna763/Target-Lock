@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { TrendingUp, PieChart as PieIcon, BarChart3, Smartphone, Laptop, Tablet, Watch } from "lucide-react";
+import { useTheme } from '@mui/material/styles';
+import { TrendingUp, PieChart as PieIcon, BarChart3, Smartphone, Laptop, Tablet, Watch, Package } from "lucide-react";
 import {
   LineChart,
   Line,
@@ -17,6 +18,9 @@ import {
 } from "recharts";
 
 const Analytics = () => {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
+  
   const [analytics, setAnalytics] = useState({
     totalProducts: 0,
     avgProfitability: 0,
@@ -116,27 +120,47 @@ const Analytics = () => {
   ];
 
   return (
-    <div className="p-6">
-      {/* Header */}
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-        Analytics & Insights
-      </h2>
-      <p className="text-gray-600 mb-6">
-        Explore product trends, performance, and market distribution.
-      </p>
+    <div className={`min-h-screen ${isDark ? 'text-white' : 'text-gray-900'}`}>
+      {/* Hero Header */}
+      <div className={`relative overflow-hidden rounded-3xl mb-8 ${isDark ? 'bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900' : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600'}`}>
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative px-8 py-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2 flex items-center gap-3">
+                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+                  <BarChart3 className="w-8 h-8" />
+                </div>
+                Analytics & Insights
+              </h1>
+              <p className="text-white/80 text-lg">Explore product trends, performance, and market distribution</p>
+            </div>
+          </div>
+        </div>
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
+      </div>
 
       {/* Metrics Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         {metrics.map((metric) => (
           <div
             key={metric.id}
-            className={`bg-gradient-to-br ${metric.color} rounded-2xl p-6 shadow-md hover:shadow-xl transition transform hover:-translate-y-1`}
+            className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+              isDark 
+                ? 'bg-gradient-to-br from-gray-900/50 to-gray-800/50 border border-gray-700/50' 
+                : `bg-gradient-to-br ${metric.color} border border-gray-200/50`
+            } backdrop-blur-xl shadow-xl`}
           >
-            <div className="mb-4">{metric.icon}</div>
-            <h3 className="text-lg font-semibold text-gray-800">
-              {metric.name}
-            </h3>
-            <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            <div className="relative z-10">
+              <div className="mb-4">{metric.icon}</div>
+              <h3 className={`text-lg font-semibold mb-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
+                {metric.name}
+              </h3>
+              <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{metric.value}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -144,8 +168,11 @@ const Analytics = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Profitability by Category Bar Chart */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className={`${isDark ? 'bg-gray-900/50 border-gray-700/50' : 'bg-white/70 border-gray-200/50'} backdrop-blur-xl rounded-3xl shadow-2xl border p-8`}>
+          <h3 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`p-2 rounded-xl ${isDark ? 'bg-blue-500/20' : 'bg-blue-100'}`}>
+              <BarChart3 className={`w-6 h-6 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
+            </div>
             Profitability by Category
           </h3>
           {analytics.loading ? (
@@ -155,9 +182,9 @@ const Analytics = () => {
           ) : (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={analytics.profitabilityTrends}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="category" />
-                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" stroke={isDark ? "#374151" : "#e5e7eb"} />
+                <XAxis dataKey="category" stroke={isDark ? "#9ca3af" : "#6b7280"} />
+                <YAxis stroke={isDark ? "#9ca3af" : "#6b7280"} />
                 <Tooltip 
                   formatter={(value, name) => [
                     name === 'profitability' ? `${value}%` : value,
@@ -171,8 +198,11 @@ const Analytics = () => {
         </div>
 
         {/* Category Distribution Pie Chart */}
-        <div className="bg-white rounded-2xl shadow-md p-6">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className={`${isDark ? 'bg-gray-900/50 border-gray-700/50' : 'bg-white/70 border-gray-200/50'} backdrop-blur-xl rounded-3xl shadow-2xl border p-8`}>
+          <h3 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+            <div className={`p-2 rounded-xl ${isDark ? 'bg-purple-500/20' : 'bg-purple-100'}`}>
+              <PieIcon className={`w-6 h-6 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
+            </div>
             Category Distribution
           </h3>
           {analytics.loading ? (
@@ -212,18 +242,33 @@ const Analytics = () => {
       {/* Category Details Cards */}
       {!analytics.loading && (
         <div className="mt-8">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Category Breakdown</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {analytics.categoryData.map((category, index) => (
-              <div key={category.category} className="bg-white rounded-xl shadow-md p-6 border-l-4" style={{borderLeftColor: COLORS[index % COLORS.length]}}>
-                <div className="flex items-center justify-between mb-2">
-                  {categoryIcons[category.category] || <PieIcon className="w-8 h-8 text-gray-500" />}
-                  <span className="text-2xl font-bold text-gray-900">{category.value}</span>
-                </div>
-                <h4 className="font-semibold text-gray-800">{category.name}</h4>
-                <p className="text-sm text-gray-600">Products available</p>
+          <div className={`${isDark ? 'bg-gray-900/50 border-gray-700/50' : 'bg-white/70 border-gray-200/50'} backdrop-blur-xl rounded-3xl shadow-2xl border p-8`}>
+            <h3 className={`text-2xl font-bold mb-6 flex items-center gap-3 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+              <div className={`p-2 rounded-xl ${isDark ? 'bg-indigo-500/20' : 'bg-indigo-100'}`}>
+                <Package className={`w-6 h-6 ${isDark ? 'text-indigo-400' : 'text-indigo-600'}`} />
               </div>
-            ))}
+              Category Breakdown
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {analytics.categoryData.map((category, index) => (
+                <div 
+                  key={category.category} 
+                  className={`group relative overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:scale-105 hover:shadow-2xl ${
+                    isDark 
+                      ? 'bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50' 
+                      : 'bg-white/80 border border-gray-200/50 hover:bg-white'
+                  } backdrop-blur-sm shadow-xl border-l-4`}
+                  style={{borderLeftColor: COLORS[index % COLORS.length]}}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    {categoryIcons[category.category] || <PieIcon className={`w-8 h-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />}
+                    <span className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>{category.value}</span>
+                  </div>
+                  <h4 className={`font-semibold mb-1 ${isDark ? 'text-white' : 'text-gray-800'}`}>{category.name}</h4>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>Products available</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

@@ -20,6 +20,7 @@ import Reports from './pages/Reports';
 import Analytics from './pages/Analytics';
 import Chatbot from './pages/Chatbot';
 import UserProfile from './pages/UserProfile';
+import Favourites from './pages/Favourites';
 import ExcelReport from './pages/ExcelReport';
 import PDFReport from './pages/PDFReport';
 import CSVReport from './pages/CSVReport';
@@ -69,6 +70,7 @@ const AppRoutes = ({ mode, toggleTheme }) => {
                 <Route path="/reports" element={<PrivateRoute><Reports /></PrivateRoute>} />
                 <Route path="/analytics" element={<PrivateRoute><Analytics /></PrivateRoute>} />
                 <Route path="/chatbot" element={<PrivateRoute><Chatbot /></PrivateRoute>} />
+                <Route path="/favourites" element={<PrivateRoute><Favourites /></PrivateRoute>} />
                 <Route path="/profile" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
                 <Route path="/reports/excel" element={<PrivateRoute><ExcelReport /></PrivateRoute>} />
                 <Route path="/reports/pdf" element={<PrivateRoute><PDFReport /></PrivateRoute>} />
